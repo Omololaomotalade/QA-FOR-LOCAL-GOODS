@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Omolola's Fresh Produce Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--green:#1a6b3a;--gl:#e8f5ed;--gold:#c07b1c;--goldl:#fef6e4;--cream:#fdf9f3;--text:#1a1a18;--muted:#6b6b63;--bd:rgba(0,0,0,0.11)}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh}
+  .wrap{max-width:520px;margin:0 auto;padding-bottom:5rem}
+  .hero{background:var(--green);color:#fff;padding:2rem 1.5rem 1.75rem;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;right:-50px;top:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.06)}
+  .hero-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:.25rem}
+  .hero h1{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;line-height:1.2;margin-bottom:.2rem}
+  .hero-owner{font-size:13px;color:rgba(255,255,255,0.8);font-style:italic;margin-bottom:.35rem}
+  .hero p{font-size:12px;color:rgba(255,255,255,0.6);line-height:1.5}
+  .hero-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold);color:#fff;font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;margin-top:.6rem}
+  .search-bar{margin:.75rem 1.25rem 0;background:#fff;border-radius:10px;display:flex;align-items:center;padding:0 12px;gap:8px;border:0.5px solid var(--bd)}
+  .search-bar input{border:none;outline:none;flex:1;padding:11px 0;font-size:13px;background:transparent;font-family:'DM Sans',sans-serif;color:var(--text)}
+  .cats{display:flex;gap:7px;padding:.7rem 1.25rem;overflow-x:auto;scrollbar-width:none}
+  .cats::-webkit-scrollbar{display:none}
+  .cat-btn{flex-shrink:0;padding:5px 13px;border-radius:20px;border:0.5px solid var(--bd);background:#fff;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;color:var(--text)}
+  .cat-btn.active,.cat-btn:hover{background:var(--green);color:#fff;border-color:var(--green)}
+  .slabel{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 1.25rem .55rem;font-weight:500}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 1.25rem 6rem}
+  .card{background:#fff;border-radius:13px;overflow:hidden;border:0.5px solid var(--bd);transition:transform .15s;cursor:pointer}
+  .card:active{transform:scale(0.97)}
+  .card-img{width:100%;height:115px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .card-img svg{width:100%;height:100%;position:absolute;top:0;left:0}
+  .card-body{padding:9px 11px 11px}
+  .card-name{font-weight:500;font-size:13px;margin-bottom:1px}
+  .card-origin{font-size:11px;color:var(--muted);margin-bottom:5px}
+  .card-footer{display:flex;align-items:center;justify-content:space-between}
+  .card-price{font-weight:500;font-size:14px;color:var(--green)}
+  .add-btn{width:26px;height:26px;border-radius:7px;background:var(--green);border:none;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+  .fbadge{font-size:9px;background:var(--gl);color:var(--green);padding:2px 6px;border-radius:8px;font-weight:500;margin-bottom:4px;display:inline-block}
+  .cart-bar{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);width:calc(100% - 2.5rem);max-width:480px;background:var(--green);color:#fff;border-radius:14px;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:opacity .25s,transform .25s;z-index:50;box-shadow:0 6px 24px rgba(0,0,0,0.2)}
+  .cart-bar.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(12px)}
+  .ccnt{background:var(--gold);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;justify-content:center;z-index:100}
+  .modal-bg.hidden{display:none}
+  .modal{background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:1.25rem}
+  .mhandle{width:36px;height:4px;background:rgba(0,0,0,0.12);border-radius:2px;margin:0 auto 1rem}
+  .modal h2{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:1rem}
+  .ci{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--bd)}
+  .ci-thumb{width:44px;height:44px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .ci-thumb svg{width:44px;height:44px}
+  .ci-info{flex:1}
+  .ci-name{font-size:13px;font-weight:500}
+  .ci-price{font-size:12px;color:var(--muted)}
+  .qc{display:flex;align-items:center;gap:7px}
+  .qb{width:24px;height:24px;border-radius:6px;border:0.5px solid var(--bd);background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .qn{font-size:13px;font-weight:500;min-width:15px;text-align:center}
+  .srow{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:var(--muted)}
+  .srow.tot{font-weight:500;font-size:15px;color:var(--text);padding-top:8px;margin-top:3px;border-top:0.5px solid var(--bd)}
+  .cbtn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:1rem;transition:opacity .15s}
+  .cbtn:hover{opacity:.88}
+  .flabel{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;display:block}
+  .finput{width:100%;padding:10px 12px;border-radius:9px;border:0.5px solid var(--bd);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:#fff;outline:none;transition:border-color .15s;margin-bottom:10px}
+  .finput:focus{border-color:var(--green)}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pms{display:flex;gap:7px;margin-bottom:.85rem}
+  .pm{flex:1;padding:9px 6px;border-radius:9px;border:0.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;text-align:center;transition:all .15s;font-family:'DM Sans',sans-serif}
+  .pm.sel{border-color:var(--green);background:var(--gl);color:var(--green)}
+  .bbtn{background:none;border:none;color:var(--green);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;padding:0;display:flex;align-items:center;gap:3px;margin-bottom:.85rem}
+  .sind{display:flex;gap:5px;margin-bottom:1rem}
+  .st{flex:1;height:3px;border-radius:2px;background:var(--bd)}
+  .st.done{background:var(--green)}
+  .sscreen{text-align:center;padding:1.75rem .75rem}
+  .ckmark{width:54px;height:54px;background:var(--gl);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .85rem;font-size:1.5rem;color:var(--green)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero">
+    <p class="hero-tag">Lagos · Local Market</p>
+    <h1>Omolola's Fresh<br>Produce Store</h1>
+    <p class="hero-owner">by Omolola Omotalade</p>
+    <p>Farm-fresh goods from Ogun, Ondo &amp; Kaduna states</p>
+    <div class="hero-badge">⏱ Delivered in 3–5 hours</div>
+  </div>
+
+  <div class="search-bar">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#999" stroke-width="1.4"/><path d="M11 11l3 3" stroke="#999" stroke-width="1.4" stroke-linecap="round"/></svg>
+    <input placeholder="Search tomatoes, yam, pepper…" id="searchInput" oninput="filterProducts()">
+  </div>
+
+  <div class="cats">
+    <button class="cat-btn active" onclick="filterCat('all',this)">All</button>
+    <button class="cat-btn" onclick="filterCat('vegetable',this)">Vegetables</button>
+    <button class="cat-btn" onclick="filterCat('fruit',this)">Fruits</button>
+    <button class="cat-btn" onclick="filterCat('grain',this)">Grains &amp; Tubers</button>
+    <button class="cat-btn" onclick="filterCat('spice',this)">Spices</button>
+  </div>
+
+  <p class="slabel">All products</p>
+  <div class="grid" id="productGrid"></div>
+
+  <div class="cart-bar hidden" id="cartBar" onclick="openCart()">
+    <span style="font-size:13px">View basket</span>
+    <div style="display:flex;align-items:center;gap:9px">
+      <strong style="font-size:14px;font-weight:500" id="cartTotal">₦0</strong>
+      <div class="ccnt" id="cartCount">0</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg hidden" id="modalBg">
+  <div class="modal">
+    <div class="mhandle"></div>
+
+    <div id="cartView">
+      <h2>Your basket</h2>
+      <div id="cartItems"></div>
+      <div style="padding-top:9px">
+        <div class="srow"><span>Subtotal</span><span id="subtotalVal">₦0</span></div>
+        <div class="srow"><span>Delivery fee</span><span>₦500</span></div>
+        <div class="srow tot"><span>Total</span><span id="totalVal">₦0</span></div>
+      </div>
+      <button class="cbtn" onclick="goToPayment()">Proceed to checkout →</button>
+    </div>
+
+    <div id="payView" style="display:none">
+      <button class="bbtn" onclick="backToCart()">← Back</button>
+      <h2>Payment details</h2>
+      <div class="sind"><div class="st done"></div><div class="st done"></div><div class="st" id="s3"></div></div>
+      <label class="flabel">Full name</label>
+      <input class="finput" placeholder="Your name" type="text">
+      <label class="flabel">Phone number</label>
+      <input class="finput" placeholder="+234 80 0000 0000" type="tel">
+      <label class="flabel">Delivery address</label>
+      <input class="finput" placeholder="Street, area, Lagos…">
+      <label class="flabel" style="margin-bottom:7px">Payment method</label>
+      <div class="pms">
+        <button class="pm sel" id="pm-card" onclick="selectPay('card')">💳 Card</button>
+        <button class="pm" id="pm-transfer" onclick="selectPay('transfer')">🏦 Transfer</button>
+        <button class="pm" id="pm-ussd" onclick="selectPay('ussd')">📱 USSD</button>
+      </div>
+      <div id="card-fields">
+        <label class="flabel">Card number</label>
+        <input class="finput" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCard(this)">
+        <div class="frow">
+          <div><label class="flabel">Expiry</label><input class="finput" placeholder="MM/YY" maxlength="5" oninput="fmtExp(this)"></div>
+          <div><label class="flabel">CVV</label><input class="finput" placeholder="•••" maxlength="3" type="password"></div>
+        </div>
+      </div>
+      <div id="transfer-fields" style="display:none">
+        <div style="background:var(--gl);border-radius:10px;padding:.85rem;text-align:center">
+          <p style="font-size:11px;color:var(--muted);margin-bottom:2px">Transfer to</p>
+          <p style="font-size:19px;font-weight:500;letter-spacing:2px;color:var(--green)">0123 456 789</p>
+          <p style="font-size:12px;color:var(--muted)">GTBank · Omolola Omotalade Stores</p>
+          <p id="transferAmt" style="font-size:13px;font-weight:500;margin-top:6px"></p>
+        </div>
+      </div>
+      <div id="ussd-fields" style="display:none">
+        <div style="background:var(--goldl);border-radius:10px;padding:.85rem;text-align:center">
+          <p style="font-size:11px;color:var(--muted);margin-bottom:2px">Dial on your phone</p>
+          <p style="font-size:20px;font-weight:500;letter-spacing:1px;color:var(--gold)">*737*1*<span id="ussdAmt"></span>#</p>
+          <p style="font-size:12px;color:var(--muted)">GTBank USSD · No internet needed</p>
+        </div>
+      </div>
+      <button class="cbtn" id="payBtn" onclick="processPayment()">Pay <span id="payBtnAmt"></span></button>
+    </div>
+
+    <div id="successView" style="display:none">
+      <div class="sscreen">
+        <div class="ckmark">✓</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:.4rem">Order confirmed!</h3>
+        <p style="color:var(--muted);font-size:13px;line-height:1.6">Thank you for shopping at <strong>Omolola's Fresh Produce</strong>. Your order arrives in 3–5 hours. SMS update coming shortly.</p>
+        <p style="margin-top:.6rem;font-size:11px;color:var(--muted)">Order ref: <strong id="orderRef"></strong></p>
+        <button class="cbtn" style="margin-top:1.1rem" onclick="closeAll()">Continue shopping</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SVGS={
+  tomato:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#fff5f5"/><ellipse cx="60" cy="68" rx="34" ry="32" fill="#e03e2d"/><ellipse cx="60" cy="60" rx="34" ry="32" fill="#e8472e"/><ellipse cx="48" cy="52" rx="10" ry="14" fill="#ef6b55" opacity=".5"/><path d="M60 28 Q55 20 45 22 Q50 30 60 28Z" fill="#3a7d2c"/><path d="M60 28 Q65 18 75 22 Q68 30 60 28Z" fill="#4a9c38"/><path d="M60 28 Q58 18 60 14 Q62 18 60 28Z" fill="#3a7d2c"/></svg>`,
+  pepper:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#fff8f0"/><ellipse cx="60" cy="65" rx="22" ry="28" fill="#f4a024" transform="rotate(-15 60 65)"/><ellipse cx="72" cy="60" rx="20" ry="26" fill="#e8520a" transform="rotate(10 72 60)"/><ellipse cx="48" cy="68" rx="18" ry="24" fill="#f4a024" transform="rotate(-20 48 68)"/><circle cx="82" cy="45" r="5" fill="#3a7d2c"/><line x1="82" y1="40" x2="82" y2="28" stroke="#3a7d2c" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  plantain:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#fffbf0"/><path d="M25 80 Q40 40 75 30 Q80 50 70 70 Q55 85 25 80Z" fill="#f5c842"/><path d="M30 78 Q44 44 72 35" stroke="#d4a020" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M45 75 Q58 48 78 38" stroke="#d4a020" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M72 30 Q85 25 90 32 Q82 38 75 30Z" fill="#4a9c38"/></svg>`,
+  yam:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#fdf5e8"/><ellipse cx="60" cy="62" rx="42" ry="28" fill="#8B5E3C" transform="rotate(-8 60 62)"/><ellipse cx="55" cy="58" rx="38" ry="24" fill="#A0704A" transform="rotate(-8 55 58)"/><ellipse cx="48" cy="52" rx="12" ry="8" fill="#B8835A" opacity=".5"/><path d="M78 38 Q82 30 80 24" stroke="#6B4226" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  ugwu:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#f0faf0"/><path d="M60 90 Q30 70 25 45 Q40 38 55 55 Q55 35 60 20 Q65 35 65 55 Q80 38 95 45 Q90 70 60 90Z" fill="#2d7a2d"/><path d="M60 90 Q30 70 25 45" stroke="#1a5c1a" stroke-width="1.5" fill="none"/><path d="M60 90 Q90 70 95 45" stroke="#1a5c1a" stroke-width="1.5" fill="none"/><path d="M60 20 L60 90" stroke="#1a5c1a" stroke-width="1.5"/></svg>`,
+  gardenegg:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#f8f5ff"/><ellipse cx="52" cy="68" rx="18" ry="24" fill="#c8e6a0"/><ellipse cx="70" cy="65" rx="16" ry="22" fill="#d4eda8"/><ellipse cx="38" cy="72" rx="15" ry="20" fill="#bfe096"/><circle cx="52" cy="64" r="5" fill="#fff" opacity=".3"/><path d="M55 44 Q60 36 65 40" stroke="#4a9c38" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  watermelon:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#f0fff4"/><path d="M15 75 Q60 20 105 75Z" fill="#4caf50"/><path d="M20 75 Q60 26 100 75Z" fill="#81c784"/><path d="M22 75 Q60 30 98 75Z" fill="#e53935"/><path d="M25 75 Q60 34 95 75Z" fill="#ef5350"/><circle cx="45" cy="62" r="3" fill="#1b5e20"/><circle cx="60" cy="55" r="3" fill="#1b5e20"/><circle cx="75" cy="62" r="3" fill="#1b5e20"/><circle cx="53" cy="68" r="2.5" fill="#1b5e20"/><circle cx="68" cy="68" r="2.5" fill="#1b5e20"/></svg>`,
+  ginger:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#fffbf2"/><path d="M30 65 Q45 45 65 50 Q75 40 85 55 Q90 65 80 72 Q70 80 55 72 Q40 78 30 65Z" fill="#c8a55a"/><path d="M65 50 Q68 35 75 30" stroke="#b8904a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M55 72 Q50 82 45 85" stroke="#b8904a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M80 72 Q88 75 92 72" stroke="#b8904a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  beans:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#fdf8f0"/><ellipse cx="38" cy="55" rx="13" ry="9" fill="#8B6914" transform="rotate(-20 38 55)"/><ellipse cx="60" cy="48" rx="13" ry="9" fill="#9B7820" transform="rotate(5 60 48)"/><ellipse cx="80" cy="58" rx="13" ry="9" fill="#8B6914" transform="rotate(15 80 58)"/><ellipse cx="48" cy="72" rx="13" ry="9" fill="#7A5C10" transform="rotate(-10 48 72)"/><ellipse cx="70" cy="70" rx="13" ry="9" fill="#9B7820" transform="rotate(20 70 70)"/></svg>`,
+  pineapple:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#fffbf0"/><ellipse cx="60" cy="72" rx="24" ry="32" fill="#f5c842"/><path d="M44 64 L52 56 L60 64 L68 56 L76 64" stroke="#d4a020" stroke-width="1.5" fill="none"/><path d="M44 72 L52 64 L60 72 L68 64 L76 72" stroke="#d4a020" stroke-width="1.5" fill="none"/><path d="M44 80 L52 72 L60 80 L68 72 L76 80" stroke="#d4a020" stroke-width="1.5" fill="none"/><path d="M60 40 Q52 30 48 22" stroke="#3a7d2c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M60 40 Q60 28 60 20" stroke="#4a9c38" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M60 40 Q68 30 72 22" stroke="#3a7d2c" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  orange:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#fffaf0"/><circle cx="60" cy="62" r="32" fill="#f5921e"/><circle cx="60" cy="60" r="32" fill="#f7a830"/><ellipse cx="48" cy="50" rx="10" ry="13" fill="#ffc45e" opacity=".45"/><circle cx="60" cy="60" r="18" fill="none" stroke="#e07a10" stroke-width="1" opacity=".4"/><line x1="60" y1="42" x2="60" y2="78" stroke="#e07a10" stroke-width="1" opacity=".4"/><line x1="42" y1="60" x2="78" y2="60" stroke="#e07a10" stroke-width="1" opacity=".4"/><path d="M60 28 Q58 20 60 16 Q62 20 60 28Z" fill="#3a7d2c"/></svg>`,
+  cucumber:`<svg viewBox="0 0 120 115" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="115" fill="#f0fff8"/><ellipse cx="60" cy="62" rx="20" ry="34" fill="#5cb85c" transform="rotate(-10 60 62)"/><ellipse cx="57" cy="58" rx="16" ry="30" fill="#78c878" transform="rotate(-10 57 58)"/><ellipse cx="52" cy="50" rx="6" ry="10" fill="#a8e0a8" opacity=".5" transform="rotate(-10 52 50)"/><path d="M72 35 Q76 28 74 22" stroke="#3a7d2c" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`
+};
+
+const PRODUCTS=[
+  {id:1,name:'Roma Tomatoes',origin:'Kaduna State',price:1200,unit:'1kg basket',cat:'vegetable',fresh:true,svg:'tomato'},
+  {id:2,name:'Scotch Bonnet Pepper',origin:'Ogun State',price:800,unit:'250g pack',cat:'spice',fresh:true,svg:'pepper'},
+  {id:3,name:'Sweet Plantains',origin:'Ondo State',price:1500,unit:'bunch of 6',cat:'fruit',fresh:true,svg:'plantain'},
+  {id:4,name:'Yam Tuber',origin:'Benue State',price:3500,unit:'medium tuber',cat:'grain',fresh:false,svg:'yam'},
+  {id:5,name:'Ugwu Leaves',origin:'Ogun State',price:400,unit:'large bunch',cat:'vegetable',fresh:true,svg:'ugwu'},
+  {id:6,name:'Garden Eggs',origin:'Cross River',price:600,unit:'500g',cat:'vegetable',fresh:true,svg:'gardenegg'},
+  {id:7,name:'Watermelon',origin:'Kano State',price:2500,unit:'whole fruit',cat:'fruit',fresh:true,svg:'watermelon'},
+  {id:8,name:'Ginger Root',origin:'Kaduna State',price:900,unit:'500g pack',cat:'spice',fresh:false,svg:'ginger'},
+  {id:9,name:'Brown Honey Beans',origin:'Oyo State',price:2200,unit:'2kg bag',cat:'grain',fresh:false,svg:'beans'},
+  {id:10,name:'Pineapple',origin:'Ondo State',price:1800,unit:'1 piece',cat:'fruit',fresh:true,svg:'pineapple'},
+  {id:11,name:'Oranges',origin:'Oyo State',price:1000,unit:'bag of 6',cat:'fruit',fresh:true,svg:'orange'},
+  {id:12,name:'Fresh Cucumber',origin:'Ogun State',price:500,unit:'3 pieces',cat:'vegetable',fresh:true,svg:'cucumber'},
+];
+
+let cart={},activeFilter='all';
+
+function filterProducts(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const f=PRODUCTS.filter(p=>(activeFilter==='all'||p.cat===activeFilter)&&(p.name.toLowerCase().includes(q)||p.origin.toLowerCase().includes(q)));
+  renderGrid(f);
+}
+function filterCat(cat,btn){
+  activeFilter=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');filterProducts();
+}
+function renderGrid(products){
+  document.getElementById('productGrid').innerHTML=products.map(p=>`
+    <div class="card">
+      <div class="card-img">${SVGS[p.svg]}</div>
+      <div class="card-body">
+        ${p.fresh?'<span class="fbadge">Fresh today</span>':''}
+        <div class="card-name">${p.name}</div>
+        <div class="card-origin">${p.origin} · ${p.unit}</div>
+        <div class="card-footer">
+          <span class="card-price">₦${p.price.toLocaleString()}</span>
+          <button class="add-btn" onclick="addToCart(${p.id})">+</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function addToCart(id){cart[id]=(cart[id]||0)+1;updateCartBar();}
+function updateCartBar(){
+  const cnt=Object.values(cart).reduce((a,b)=>a+b,0);
+  const sub=Object.entries(cart).reduce((a,[id,q])=>{const p=PRODUCTS.find(x=>x.id==id);return a+(p?p.price*q:0);},0);
+  document.getElementById('cartCount').textContent=cnt;
+  document.getElementById('cartTotal').textContent='₦'+sub.toLocaleString();
+  document.getElementById('cartBar').classList.toggle('hidden',cnt===0);
+}
+function openCart(){
+  renderCartItems();
+  document.getElementById('modalBg').classList.remove('hidden');
+  document.getElementById('cartView').style.display='block';
+  document.getElementById('payView').style.display='none';
+  document.getElementById('successView').style.display='none';
+}
+function renderCartItems(){
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  const sub=items.reduce((a,[id,q])=>{const p=PRODUCTS.find(x=>x.id==id);return a+(p?p.price*q:0);},0);
+  document.getElementById('cartItems').innerHTML=items.map(([id,qty])=>{
+    const p=PRODUCTS.find(x=>x.id==id);
+    return`<div class="ci">
+      <div class="ci-thumb">${SVGS[p.svg]}</div>
+      <div class="ci-info"><div class="ci-name">${p.name}</div><div class="ci-price">₦${p.price.toLocaleString()} · ${p.unit}</div></div>
+      <div class="qc">
+        <button class="qb" onclick="changeQty(${id},-1)">−</button>
+        <span class="qn">${qty}</span>
+        <button class="qb" onclick="changeQty(${id},1)">+</button>
+      </div>
+    </div>`;}).join('');
+  document.getElementById('subtotalVal').textContent='₦'+sub.toLocaleString();
+  document.getElementById('totalVal').textContent='₦'+(sub+500).toLocaleString();
+}
+function changeQty(id,delta){
+  cart[id]=(cart[id]||0)+delta;
+  if(cart[id]<=0)delete cart[id];
+  updateCartBar();renderCartItems();
+  if(!Object.keys(cart).length)closeAll();
+}
+function goToPayment(){
+  const sub=Object.entries(cart).reduce((a,[id,q])=>{const p=PRODUCTS.find(x=>x.id==id);return a+(p?p.price*q:0);},0);
+  const total=sub+500;
+  document.getElementById('cartView').style.display='none';
+  document.getElementById('payView').style.display='block';
+  document.getElementById('payBtnAmt').textContent='₦'+total.toLocaleString();
+  document.getElementById('transferAmt').textContent='Amount: ₦'+total.toLocaleString();
+  document.getElementById('ussdAmt').textContent=total;
+}
+function backToCart(){document.getElementById('payView').style.display='none';document.getElementById('cartView').style.display='block';}
+function selectPay(m){
+  ['card','transfer','ussd'].forEach(x=>{
+    document.getElementById('pm-'+x).classList.toggle('sel',x===m);
+    document.getElementById(x+'-fields').style.display=x===m?'block':'none';
+  });
+}
+function fmtCard(el){let v=el.value.replace(/\D/g,'').substring(0,16);el.value=v.replace(/(.{4})/g,'$1 ').trim();}
+function fmtExp(el){let v=el.value.replace(/\D/g,'');if(v.length>=2)v=v.substring(0,2)+'/'+v.substring(2,4);el.value=v;}
+function processPayment(){
+  const btn=document.getElementById('payBtn');
+  btn.textContent='Processing…';btn.style.opacity='.65';btn.disabled=true;
+  setTimeout(()=>{
+    document.getElementById('payView').style.display='none';
+    document.getElementById('successView').style.display='block';
+    document.getElementById('s3').classList.add('done');
+    document.getElementById('orderRef').textContent='OOT-'+Math.random().toString(36).substring(2,8).toUpperCase();
+    cart={};updateCartBar();
+    btn.innerHTML='Pay <span id="payBtnAmt"></span>';btn.style.opacity='1';btn.disabled=false;
+  },2000);
+}
+function closeAll(){document.getElementById('modalBg').classList.add('hidden');}
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg'))closeAll();});
+renderGrid(PRODUCTS);
+</script>
+</body>
+</html>
